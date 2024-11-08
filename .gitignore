@@ -34,3 +34,9 @@
 *.exe
 *.out
 *.app
+.exe
+*.vcxproj
+*.exe
+.vs/OpenGL/FileContentIndex
+x64
+.vs/OpenGL/v17
