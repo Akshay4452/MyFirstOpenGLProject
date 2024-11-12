@@ -3,6 +3,68 @@
 
 #include <iostream>
 
+static unsigned int CompileShader(unsigned int type, const std::string& source)
+{
+    unsigned int id = glCreateShader(GL_VERTEX_SHADER);  // vertex shader created
+    const char* src = source.c_str();  // c_str() returns the pointer, source needs to be non-null value
+
+    // 1. Set Shader source
+    glShaderSource(id, 1, &src, nullptr);
+
+    // 2. Compile the shader
+    glCompileShader(id);
+
+    int success;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &success); // iv = integer vector
+    if (success == GL_FALSE)
+    {
+        // compile error for shader
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char* message = (char*) alloca(length * sizeof(char)); // Dynamic allocation on heap memory
+        glGetShaderInfoLog(id, length, &length, message);  // Write error to log
+        std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!" << std::endl;
+        std::cout << message << std::endl;
+
+        glDeleteShader(id);  // delete failed shader
+        return 0;
+    }
+
+    return id;
+}
+
+static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+{
+    /* program = program ID
+    *  vs = vertex shader ID
+    *  fs = fragment shader ID
+    */
+    unsigned int program = glCreateProgram(); // program object to link multiple shader later in the pipeline
+
+    // create shader objects
+    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    // Attach shaders to a program created above
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+
+    // Link the program
+    glLinkProgram(program);
+
+    // Validate the program
+    glValidateProgram(program);
+
+    // Use the program for rendering
+    glUseProgram(program);
+
+    // Delete the shader
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    return program;
+}
+
 int main(void)
 {
     GLFWwindow* window;
