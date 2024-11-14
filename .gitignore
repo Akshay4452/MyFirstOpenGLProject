@@ -40,3 +40,5 @@
 .vs/OpenGL/FileContentIndex
 x64
 .vs/OpenGL/v17
+*.filters
+*.user
