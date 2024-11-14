@@ -3,9 +3,10 @@
 
 #include <iostream>
 
+// The function compiles the shader and returns its object id
 static unsigned int CompileShader(unsigned int type, const std::string& source)
 {
-    unsigned int id = glCreateShader(GL_VERTEX_SHADER);  // vertex shader created
+    unsigned int id = glCreateShader(type);  // shader created
     const char* src = source.c_str();  // c_str() returns the pointer, source needs to be non-null value
 
     // 1. Set Shader source
@@ -55,9 +56,6 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     // Validate the program
     glValidateProgram(program);
 
-    // Use the program for rendering
-    glUseProgram(program);
-
     // Delete the shader
     glDeleteShader(vs);
     glDeleteShader(fs);
@@ -104,6 +102,31 @@ int main(void)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
+    std::string vertexShader =
+        "#version 330 core\n"
+        "\n"
+        "layout(location = 0) in vec4 position;\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = position;\n"
+        "}\n";
+
+    std::string fragmentShader = 
+        "#version 330 core\n"
+        "\n"
+        "layout(location = 0) out vec4 color;\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
+        "}\n";
+
+    unsigned int shader = CreateShader(vertexShader, fragmentShader);
+
+    // Use the program for rendering
+    glUseProgram(shader);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -118,6 +141,9 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+
+    // Cleanup
+    glDeleteProgram(shader);
 
     glfwTerminate();
     return 0;
