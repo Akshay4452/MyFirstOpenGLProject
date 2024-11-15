@@ -174,7 +174,7 @@ int main(void)
     }
 
     // Cleanup
-    //glDeleteProgram(shader);
+    glDeleteProgram(shader);
 
     glfwTerminate();
     return 0;
