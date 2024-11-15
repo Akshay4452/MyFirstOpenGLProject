@@ -107,6 +107,19 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     return program;
 }
 
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static void GLCheckError()
+{
+    while (GLenum error = glGetError())
+    {
+        std::cout << "[OpenGL Error] ( " << error << " )" << std::endl;
+    }
+}
+
 int main(void)
 {
     GLFWwindow* window;
@@ -177,7 +190,9 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        GLClearError();
+        glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr); // GL_INT is passed instead of GL_UNSIGNED_INT
+        GLCheckError();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
