@@ -147,6 +147,8 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(2);  // sets the swap interval for current OpenGL context. Used to smoothly animate color of rectangle
+
     GLenum err = glewInit();  // glewInit() must be called after creating valid OpenGL rendering context as above
     if (err != GLEW_OK)
         std::cout << "Error!" << std::endl;
@@ -190,7 +192,16 @@ int main(void)
     unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
 
     // Use the program for rendering
-    glUseProgram(shader);
+    GLCall(glUseProgram(shader));
+
+    GLCall(int location = glGetUniformLocation(shader, "u_Color"));  // retrieve the location
+    ASSERT(location != -1);  // if uniform variable not found then location would be -1
+    GLCall(glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f));
+
+    /* NOTE: glUniform4f() must be called before glDrawArray() call */
+
+    float r = 0.0f;
+    float increment = 0.05f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -198,7 +209,15 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // GL_INT is passed instead of GL_UNSIGNED_INT
+
+        if (r > 1.0f)
+            increment = -0.05f;
+        else if (r < 0.0f)
+            increment = 0.05f;
+
+        r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
