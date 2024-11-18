@@ -128,6 +128,15 @@ static bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
+// Input processing
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) // After pressing the Escape key, window will close
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
+}
+
 int main(void)
 {
     GLFWwindow* window;
@@ -206,11 +215,14 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        // Process the input
+        processInput(window);
+
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
         GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // GL_INT is passed instead of GL_UNSIGNED_INT
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         if (r > 1.0f)
             increment = -0.05f;
@@ -220,7 +232,7 @@ int main(void)
         r += increment;
 
         /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window); // To make rendered frame visible
 
         /* Poll for and process events */
         glfwPollEvents();
@@ -229,6 +241,6 @@ int main(void)
     // Cleanup
     glDeleteProgram(shader);
 
-    glfwTerminate();
+    glfwTerminate(); // To properly clean/delete all of GLFW's resources that were allocated
     return 0;
 }
