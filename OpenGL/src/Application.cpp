@@ -106,6 +106,7 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     glValidateProgram(program);
 
     // Delete the shader
+    // We don't need the shader objects after linking them with the program object, we no longer need them anymore
     glDeleteShader(vs);
     glDeleteShader(fs);
 
@@ -146,7 +147,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Learning OpenGL", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
