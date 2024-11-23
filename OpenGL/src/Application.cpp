@@ -160,6 +160,14 @@ int main(void)
             -0.5f,   0.5f  // 3
         };
 
+        // RGB triangle positions
+        float rgbpos[] =
+        {
+            0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 1.0f, 0.0f,
+           -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+        };
+
         // Index buffer
         unsigned int indices[] = {
             0, 1, 2,  // Indices of positions to create first triangle
@@ -172,16 +180,26 @@ int main(void)
         GLCall(glBindVertexArray(vao));
 
         VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+        VertexBuffer vbrgb(rgbpos, 3 * 5 * sizeof(float));
 
+        /*GLCall(glEnableVertexAttribArray(0));
+        GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));*/
+
+        /* Code added to display the RGB Triangle starts */
         GLCall(glEnableVertexAttribArray(0));
-        GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+        GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
+
+        GLCall(glEnableVertexAttribArray(1));
+        GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (2 * sizeof(float))));
+        /* Code added to display the RGB Triangle ends */
 
         // Note: glVertexAttribPointer() automatically binds the vertex buffer with vertex array
 
         // Generating and binding index buffer
         IndexBuffer ib(indices, 6);
 
-        ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
+        //ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
+        ShaderProgramSource source = ParseShader("res/shaders/RGB_Triangle.shader");
 
         std::cout << "...VERTEX SHADER CODE..." << std::endl;
         std::cout << source.vertexSource << std::endl;
@@ -193,16 +211,11 @@ int main(void)
         // Use the program for rendering
         GLCall(glUseProgram(shader));
 
-        GLCall(int location = glGetUniformLocation(shader, "u_Color"));  // retrieve the location
-        ASSERT(location != -1);  // if uniform variable not found then location would be -1
-        GLCall(glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f));
+        //GLCall(int location = glGetUniformLocation(shader, "u_Color"));  // retrieve the location
+        //ASSERT(location != -1);  // if uniform variable not found then location would be -1
+        //GLCall(glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f));  // sets the "uniform" variable value
 
         /* NOTE: glUniform4f() must be called before glDrawArray() call */
-
-        // Unbound everything
-        GLCall(glUseProgram(0));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
         float r = 0.0f;
         float increment = 0.05f;
@@ -217,15 +230,16 @@ int main(void)
             glClear(GL_COLOR_BUFFER_BIT);
 
             GLCall(glUseProgram(shader));
-            GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
+            //GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
 
             // Bind vertex array
             GLCall(glBindVertexArray(vao));
 
             // Index Buffer
-            GLCall(ib.Bind());
+            //ib.Bind();
 
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            //GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            GLCall(glDrawArrays(GL_TRIANGLES, 0, 3));
 
             if (r > 1.0f)
                 increment = -0.05f;
