@@ -17,3 +17,16 @@ bool GLLogCall(const char* function, const char* file, int line)
     }
     return true;
 }
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+    shader.Bind();
+
+    // Bind vertex array
+    va.Bind();
+
+    // Index Buffer
+    ib.Bind();
+
+    GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+}
